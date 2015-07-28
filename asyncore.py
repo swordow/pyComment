@@ -80,6 +80,7 @@ _reraised_exceptions = (ExitNow, KeyboardInterrupt, SystemExit)
 
 def read(obj):
     try:
+        # calling the obj's handle_read_event
         obj.handle_read_event()
     except _reraised_exceptions:
         raise
@@ -87,7 +88,8 @@ def read(obj):
         obj.handle_error()
 
 def write(obj):
-    try:
+    try: 
+        #calling the obj's handle_write_event
         obj.handle_write_event()
     except _reraised_exceptions:
         raise
@@ -124,7 +126,7 @@ def readwrite(obj, flags):
 
 def poll(timeout=0.0, map=None):
     if map is None:
-        map = socket_map
+        map = socket_map # default map is none and using socket_map and default socket_map is {}
     if map:
         r = []; w = []; e = []
         for fd, obj in map.items():
@@ -137,10 +139,10 @@ def poll(timeout=0.0, map=None):
                 w.append(fd)
             if is_r or is_w:
                 e.append(fd)
-        if [] == r == w == e:
+        if [] == r == w == e: # there is no in map and sleep 0.0
             time.sleep(timeout)
             return
-
+        # there is something in the map
         try:
             r, w, e = select.select(r, w, e, timeout)
         except select.error, err:
@@ -209,17 +211,19 @@ def loop(timeout=30.0, use_poll=False, map=None, count=None):
     if use_poll and hasattr(select, 'poll'):
         poll_fun = poll2
     else:
-        poll_fun = poll
-
-    if count is None:
+        poll_fun = poll # default poll
+    
+    # loop 
+    if count is None: # count default None
         while map:
-            poll_fun(timeout, map)
+            poll_fun(timeout, map) # start poll
 
     else:
         while map and count > 0:
             poll_fun(timeout, map)
             count = count - 1
 
+# It is used to be derived
 class dispatcher:
 
     debug = False
