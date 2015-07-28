@@ -63,7 +63,7 @@ _DISCONNECTED = frozenset((ECONNRESET, ENOTCONN, ESHUTDOWN, ECONNABORTED, EPIPE,
 try:
     socket_map
 except NameError:
-    socket_map = {}
+    socket_map = {} # it is global and if the subclass has the reference to the global , the sub class could change the socket_map
 
 def _strerror(err):
     try:
